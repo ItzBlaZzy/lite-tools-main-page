@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Nyxen — Lite Tools, Zero Bloat</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #0f0f16;
+  --surface2: #141420;
+  --border: #1e1e2e;
+  --border2: #2a2a3e;
+  --white: #f0f0f5;
+  --grey: #6b6b80;
+  --grey2: #3a3a50;
+  --mono: 'DM Mono', monospace;
+  --display: 'Bebas Neue', sans-serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: var(--mono);
+  overflow-x: hidden;
+}
+
+/* NOISE OVERLAY */
+body::after {
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;
+  z-index:999;
+  opacity:0.4;
+}
+
+/* NAV */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:20px 48px;
+  background: rgba(10,10,15,0.8);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family: var(--display);
+  font-size:28px;
+  letter-spacing:4px;
+  color: var(--white);
+}
+.nav-logo span { color: var(--grey); }
+.nav-links { display:flex; gap:32px; }
+.nav-links a {
+  font-size:11px;
+  letter-spacing:2px;
+  color: var(--grey);
+  text-decoration:none;
+  transition: color 0.2s;
+  text-transform:uppercase;
+}
+.nav-links a:hover { color: var(--white); }
+
+/* HERO */
+.hero {
+  min-height:100vh;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  text-align:center;
+  padding:120px 40px 80px;
+  position:relative;
+}
+
+.hero-eyebrow {
+  font-size:10px;
+  letter-spacing:4px;
+  color: var(--grey);
+  text-transform:uppercase;
+  margin-bottom:28px;
+  display:flex; align-items:center; gap:12px;
+  animation: fadeUp 0.8s ease both;
+}
+.hero-eyebrow::before, .hero-eyebrow::after {
+  content:'';
+  width:40px; height:1px;
+  background: var(--border2);
+}
+
+.hero h1 {
+  font-family: var(--display);
+  font-size: clamp(80px, 14vw, 180px);
+  line-height:0.9;
+  letter-spacing:6px;
+  color: var(--white);
+  margin-bottom:8px;
+  animation: fadeUp 0.8s 0.1s ease both;
+}
+
+.hero-sub {
+  font-family: var(--display);
+  font-size: clamp(20px, 4vw, 44px);
+  letter-spacing:8px;
+  color: var(--grey);
+  margin-bottom:40px;
+  animation: fadeUp 0.8s 0.2s ease both;
+}
+
+.hero-desc {
+  font-size:13px;
+  line-height:1.9;
+  color: var(--grey);
+  max-width:480px;
+  margin:0 auto 56px;
+  animation: fadeUp 0.8s 0.3s ease both;
+}
+
+.hero-cta {
+  display:flex; gap:12px; justify-content:center;
+  animation: fadeUp 0.8s 0.4s ease both;
+}
+
+.btn {
+  padding:13px 32px;
+  font-family: var(--mono);
+  font-size:11px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  text-decoration:none;
+  border-radius:4px;
+  cursor:pointer;
+  transition:all 0.2s;
+  border:none;
+}
+.btn-white {
+  background: var(--white);
+  color: var(--bg);
+  font-weight:500;
+}
+.btn-white:hover { background:#fff; transform:translateY(-2px); box-shadow:0 8px 32px rgba(240,240,245,0.15); }
+.btn-outline {
+  background:transparent;
+  color: var(--grey);
+  border: 1px solid var(--border2);
+}
+.btn-outline:hover { border-color: var(--grey); color: var(--white); }
+
+.scroll-hint {
+  position:absolute; bottom:40px; left:50%; transform:translateX(-50%);
+  font-size:10px; letter-spacing:3px; color:var(--grey2);
+  display:flex; flex-direction:column; align-items:center; gap:8px;
+  animation: fadeUp 1s 0.8s ease both;
+}
+.scroll-line {
+  width:1px; height:40px;
+  background: linear-gradient(to bottom, var(--grey2), transparent);
+  animation: scrollLine 1.5s ease-in-out infinite;
+}
+@keyframes scrollLine { 0%,100%{opacity:0.3} 50%{opacity:1} }
+
+/* TOOLS SECTION */
+.tools {
+  padding:100px 48px;
+  max-width:1200px;
+  margin:0 auto;
+}
+
+.section-header {
+  display:flex; align-items:baseline; gap:16px;
+  margin-bottom:64px;
+}
+.section-num {
+  font-size:11px; letter-spacing:3px; color:var(--grey2);
+}
+.section-title {
+  font-family: var(--display);
+  font-size:48px; letter-spacing:4px;
+  color:var(--white);
+}
+
+.tools-grid {
+  display:grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap:1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius:12px;
+  overflow:hidden;
+}
+
+.tool-item {
+  background: var(--bg);
+  padding:44px;
+  text-decoration:none;
+  display:block;
+  position:relative;
+  transition:background 0.2s;
+  overflow:hidden;
+}
+.tool-item::before {
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0; bottom:0;
+  background: var(--surface);
+  opacity:0;
+  transition:opacity 0.2s;
+}
+.tool-item:hover::before { opacity:1; }
+.tool-item:hover .tool-arrow { transform:translate(4px,-4px); opacity:1; }
+
+.tool-num {
+  font-size:10px; letter-spacing:3px; color:var(--grey2);
+  margin-bottom:20px;
+  position:relative; z-index:1;
+}
+
+.tool-name {
+  font-family: var(--display);
+  font-size:36px; letter-spacing:3px;
+  color:var(--white);
+  margin-bottom:12px;
+  position:relative; z-index:1;
+  line-height:1;
+}
+
+.tool-desc {
+  font-size:12px; line-height:1.8;
+  color:var(--grey);
+  margin-bottom:28px;
+  max-width:320px;
+  position:relative; z-index:1;
+}
+
+.tool-tags {
+  display:flex; flex-wrap:wrap; gap:8px;
+  margin-bottom:32px;
+  position:relative; z-index:1;
+}
+.tool-tag {
+  font-size:10px; letter-spacing:1px;
+  padding:4px 10px;
+  border:1px solid var(--border2);
+  border-radius:3px;
+  color:var(--grey2);
+}
+
+.tool-link {
+  font-size:11px; letter-spacing:2px;
+  color:var(--grey);
+  display:flex; align-items:center; gap:8px;
+  position:relative; z-index:1;
+  transition:color 0.2s;
+}
+.tool-item:hover .tool-link { color:var(--white); }
+
+.tool-arrow {
+  font-size:14px;
+  opacity:0.4;
+  transition:all 0.2s;
+}
+
+/* MANIFESTO */
+.manifesto {
+  padding:100px 48px;
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  text-align:center;
+}
+.manifesto-text {
+  font-family: var(--display);
+  font-size: clamp(32px, 5vw, 64px);
+  letter-spacing:3px;
+  line-height:1.2;
+  color:var(--white);
+  max-width:900px;
+  margin:0 auto;
+}
+.manifesto-text span { color:var(--grey2); }
+
+/* FOOTER */
+footer {
+  padding:32px 48px;
+  display:flex; justify-content:space-between; align-items:center;
+  font-size:11px; letter-spacing:2px; color:var(--grey2);
+}
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(24px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+@media(max-width:768px) {
+  nav { padding:16px 24px; }
+  .nav-links { display:none; }
+  .hero { padding:100px 24px 80px; }
+  .tools { padding:60px 24px; }
+  .tools-grid { grid-template-columns:1fr; }
+  .tool-item { padding:32px 24px; }
+  footer { flex-direction:column; gap:12px; text-align:center; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">NYX<span>EN</span></div>
+  <div class="nav-links">
+    <a href="#tools">Tools</a>
+    <a href="https://resumemaker.nyxen.space">Resume</a>
+    <a href="https://pomodoro.nyxen.space">Pomodoro</a>
+    <a href="https://favicon.nyxen.space">Favicon</a>
+    <a href="https://pdf.nyxen.space">PDF</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-eyebrow">Tools that respect your time</div>
+  <h1>NYXEN</h1>
+  <div class="hero-sub">LITE TOOLS</div>
+  <p class="hero-desc">No accounts. No subscriptions. No feature graveyards. Just sharp, focused tools that do exactly one thing — and do it well.</p>
+  <div class="hero-cta">
+    <a href="#tools" class="btn btn-white">See All Tools</a>
+    <a href="https://resumemaker.nyxen.space" class="btn btn-outline">Try Resume Maker</a>
+  </div>
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    SCROLL
+  </div>
+</section>
+
+<section class="tools" id="tools">
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <span class="section-title">THE TOOLS</span>
+  </div>
+
+  <div class="tools-grid">
+
+    <a class="tool-item" href="https://resumemaker.nyxen.space">
+      <div class="tool-num">// 01</div>
+      <div class="tool-name">RESUME<br/>MAKER</div>
+      <div class="tool-desc">Fill in your info, get a clean one-page PDF resume. No templates to wrestle with. No sign-up. Done in 2 minutes.</div>
+      <div class="tool-tags">
+        <span class="tool-tag">PDF EXPORT</span>
+        <span class="tool-tag">ONE PAGE</span>
+        <span class="tool-tag">NO ACCOUNT</span>
+      </div>
+      <div class="tool-link">resumemaker.nyxen.space <span class="tool-arrow">↗</span></div>
+    </a>
+
+    <a class="tool-item" href="https://pomodoro.nyxen.space">
+      <div class="tool-num">// 02</div>
+      <div class="tool-name">POMODORO<br/>TIMER</div>
+      <div class="tool-desc">Focus sessions, short breaks, long breaks. A clean timer with session tracking — nothing else cluttering the screen.</div>
+      <div class="tool-tags">
+        <span class="tool-tag">FOCUS MODE</span>
+        <span class="tool-tag">SESSION DOTS</span>
+        <span class="tool-tag">TASK LABEL</span>
+      </div>
+      <div class="tool-link">pomodoro.nyxen.space <span class="tool-arrow">↗</span></div>
+    </a>
+
+    <a class="tool-item" href="https://favicon.nyxen.space">
+      <div class="tool-num">// 03</div>
+      <div class="tool-name">FAVICON<br/>GENERATOR</div>
+      <div class="tool-desc">Type a letter, pick a style, download your favicon.ico. Every site needs one. This takes 10 seconds to make.</div>
+      <div class="tool-tags">
+        <span class="tool-tag">ICO EXPORT</span>
+        <span class="tool-tag">PNG EXPORT</span>
+        <span class="tool-tag">INSTANT</span>
+      </div>
+      <div class="tool-link">favicon.nyxen.space <span class="tool-arrow">↗</span></div>
+    </a>
+
+    <a class="tool-item" href="https://pdf.nyxen.space">
+      <div class="tool-num">// 04</div>
+      <div class="tool-name">PDF<br/>EDITOR</div>
+      <div class="tool-desc">Merge, split, reorder pages, add text. No Adobe. No uploads to sketchy servers. Everything runs right in your browser.</div>
+      <div class="tool-tags">
+        <span class="tool-tag">MERGE</span>
+        <span class="tool-tag">SPLIT</span>
+        <span class="tool-tag">ADD TEXT</span>
+        <span class="tool-tag">REORDER</span>
+      </div>
+      <div class="tool-link">pdf.nyxen.space <span class="tool-arrow">↗</span></div>
+    </a>
+
+  </div>
+</section>
+
+<section class="manifesto">
+  <div class="manifesto-text">
+    Most tools are built to keep you inside them. <span>Nyxen tools are built to get you out.</span>
+  </div>
+</section>
+
+<footer>
+  <span>NYXEN — LITE TOOLS</span>
+  <span>ZERO BLOAT. ZERO ACCOUNTS. ZERO BS.</span>
+</footer>
+
+</body>
+</html>
